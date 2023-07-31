@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from university.models import User, Curator
+from university.models import User, Curator, Student, Group, EduDirection, AcademicDiscipline
 
 
 class MyUserSerializer(UserCreateSerializer):
@@ -30,7 +30,8 @@ class MyUserSerializer(UserCreateSerializer):
 
     class Meta:
         model = User
-        fields = ('username',
+        fields = ('pk',
+                  'username',
                   'password',
                   'first_name',
                   'last_name',
@@ -45,7 +46,7 @@ class CuratorSerializer(ModelSerializer):
 
     class Meta:
         model = Curator
-        fields = ('user', )
+        fields = ('pk', 'user', )
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -55,3 +56,40 @@ class CuratorSerializer(ModelSerializer):
 
         curator = Curator.objects.create(user=user)
         return curator
+
+
+class StudentSerializer(ModelSerializer):
+    user = MyUserSerializer(required=True)
+
+    class Meta:
+        model = Student
+        fields = ('pk', 'user', 'group')
+
+    def validate_group(self, value):
+        if value:
+            target_group = Group.objects.filter(pk=value)
+            if target_group and target_group.students.count() < Group.STUDENT_MAX_COUNT:
+                return value
+        return serializers.ValidationError("Group field not set")
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        group = validated_data['group']
+        user_serializer = MyUserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        student = Student.objects.create(user=user, group=group)
+        return student
+
+
+class EduDirectionSerializer(ModelSerializer):
+    class Meta:
+        model = EduDirection
+        fields = '__all__'
+
+
+class AcademicDisciplineSerializer(ModelSerializer):
+    class Meta:
+        model = AcademicDiscipline
+        fields = '__all__'

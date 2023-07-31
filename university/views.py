@@ -6,8 +6,10 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from university.models import Curator
-from university.serializers import CuratorSerializer
+from university.models import Curator, Student, EduDirection, AcademicDiscipline
+from university.permissions import IsCurator
+from university.serializers import CuratorSerializer, StudentSerializer, EduDirectionSerializer, \
+    AcademicDisciplineSerializer
 
 
 class CuratorViewSet(ModelViewSet):
@@ -39,3 +41,42 @@ class CuratorViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+class StudentViewSet(ModelViewSet):
+    serializer_class = StudentSerializer
+    queryset = Student.objects.all()
+    token_generator = default_token_generator
+    lookup_field = settings.USER_ID_FIELD
+    permission_classes = [IsAdminUser | IsCurator]
+
+    def permission_denied(self, request, **kwargs):
+        if (
+                settings.HIDE_USERS
+                and request.user.is_authenticated
+                and self.action in ["update", "partial_update", "list", "retrieve"]
+        ):
+            raise NotFound()
+        super().permission_denied(request, **kwargs)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        if settings.HIDE_USERS and self.action == "list" and not user.is_staff:
+            queryset = queryset.filter(pk=user.pk)
+        return queryset
+
+    def get_permissions(self):
+        if self.action in ("retrieve", "update", "partial_update", "destroy"):
+            self.permission_classes = [CurrentUserOrAdmin | IsCurator]
+        return super().get_permissions()
+
+
+class EduDirectionViewSet(ModelViewSet):
+    queryset = EduDirection.objects.all()
+    serializer_class = EduDirectionSerializer
+    permission_classes = [IsAdminUser, ]
+
+
+class AcademicDisciplineViewSet(ModelViewSet):
+    queryset = AcademicDiscipline.objects.all()
+    serializer_class = AcademicDisciplineSerializer
+    permission_classes = [IsAdminUser, ]
