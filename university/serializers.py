@@ -93,3 +93,9 @@ class AcademicDisciplineSerializer(ModelSerializer):
     class Meta:
         model = AcademicDiscipline
         fields = '__all__'
+
+
+class GroupSerializer(ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'

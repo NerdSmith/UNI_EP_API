@@ -1,13 +1,14 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class IsCurator(BasePermission):
     def has_permission(self, request, view):
-        if request.user.get_role() == 'curator':
-            return True
-        return False
+        return request.user.is_authenticated and request.user.get_role() == 'curator'
 
     def has_object_permission(self, request, view, obj):
-        if request.user.get_role() == 'curator':
-            return True
-        return False
+        return request.user.is_authenticated and request.user.get_role() == 'curator'
+
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
