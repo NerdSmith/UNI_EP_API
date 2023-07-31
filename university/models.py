@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from university.validators import CustomUnicodeUsernameValidator
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager["User"]):
     use_in_migrations = True
 
     def _create_user(self, username, email, password, **extra_fields):
@@ -202,4 +202,4 @@ class Group(models.Model):
                                   null=False)
 
     def __str__(self):
-        return f"{self.course_number} course {self.group_number} group {self.EDUCATION_LEVELS[self.education_level]}"
+        return f"{self.course_number} course {self.group_number} group {dict(self.EDUCATION_LEVELS)[self.education_level]}"
