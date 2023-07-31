@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
@@ -32,6 +33,7 @@ DEBUG = os.getenv("DEBUG") == "1"
 
 ALLOWED_HOSTS = []
 
+HIDE_USERS = True
 
 # Application definition
 
@@ -44,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party apps
-    'drf_yasg',
+    'drf_spectacular',
     'rest_framework',
     'djoser',
 
@@ -141,25 +143,30 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            "name": "Authorization",
-            "in": "header"
-        }
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "UNI EP API",
+    'DESCRIPTION': 'University education process API',
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "filter": True,
     },
-    "USE_SESSION_AUTH": False,
-    'DOC_EXPANSION': 'none',
+    "COMPONENT_SPLIT_REQUEST": True
 }

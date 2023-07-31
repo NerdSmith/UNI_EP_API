@@ -1,3 +1,41 @@
-from django.shortcuts import render
+from djoser import signals
+from djoser.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from djoser.permissions import CurrentUserOrAdmin
+from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAdminUser
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from university.models import Curator
+from university.serializers import CuratorSerializer
+
+
+class CuratorViewSet(ModelViewSet):
+    serializer_class = CuratorSerializer
+    queryset = Curator.objects.all()
+    token_generator = default_token_generator
+    lookup_field = settings.USER_ID_FIELD
+    permission_classes = [IsAdminUser, ]
+
+    def permission_denied(self, request, **kwargs):
+        if (
+                settings.HIDE_USERS
+                and request.user.is_authenticated
+                and self.action in ["update", "partial_update", "list", "retrieve"]
+        ):
+            raise NotFound()
+        super().permission_denied(request, **kwargs)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        if settings.HIDE_USERS and self.action == "list" and not user.is_staff:
+            queryset = queryset.filter(pk=user.pk)
+        return queryset
+
+    def get_permissions(self):
+        if self.action in ("retrieve", "update", "partial_update", "destroy"):
+            self.permission_classes = [CurrentUserOrAdmin, ]
+        return super().get_permissions()
+
+

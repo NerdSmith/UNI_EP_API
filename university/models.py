@@ -120,6 +120,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
+    def get_role(self) -> str:
+        if hasattr(self, "curator"):
+            return "curator"
+        elif hasattr(self, "student"):
+            return "student"
+        elif self.is_superuser:
+            return "admin"
+        else:
+            return "not set"
+
 
 class Curator(models.Model):
     user = models.OneToOneField(
