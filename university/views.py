@@ -1,5 +1,3 @@
-import os
-
 from djoser.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from djoser.permissions import CurrentUserOrAdmin
@@ -119,6 +117,6 @@ class ReportStatusView(APIView):
                 {
                     'status': 'Success',
                     'url': media_url + report_filename
-                 }, status=status.HTTP_200_OK)
+                }, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'Not found'}, status=status.HTTP_404_NOT_FOUND)

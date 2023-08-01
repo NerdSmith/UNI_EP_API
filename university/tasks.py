@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from typing import Tuple
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
@@ -12,15 +13,15 @@ import xlsxwriter
 from celery import shared_task
 from django.conf import settings
 
-from university.models import EduDirection, Group
+from university.models import EduDirection
 from university.serializers import ReportEduDirectionDisciplineSerializer, ReportEduDirectionGroupSerializer
 
 
-def prepare_headlines_wr(main_title, worksheet, data):
+def prepare_headlines_wr(main_title, worksheet, data) -> None:
     prepare_headlines(main_title, worksheet, data)
 
 
-def prepare_headlines(main_title, worksheet, data, col=0, row=0) -> (int, int):
+def prepare_headlines(main_title, worksheet, data, col=0, row=0) -> Tuple[int, int]:
     if data:
         for col_obj in data[0]:
             curr_obj = data[0][col_obj]
@@ -45,7 +46,7 @@ def fill_data_wr(worksheet, data):
     fill_data(worksheet, data)
 
 
-def fill_data(worksheet, data, col_=0, row_=1, need_wrap=False):
+def fill_data(worksheet, data, col_=0, row_=1, need_wrap=False) -> Tuple[int, int]:
     rem_row = row_
     col = col_
 
@@ -68,7 +69,7 @@ def fill_data(worksheet, data, col_=0, row_=1, need_wrap=False):
     return col, rem_row
 
 
-def generate_worksheet(workbook, name, main_title, queryset, serializer):
+def generate_worksheet(workbook, name, main_title, queryset, serializer) -> None:
     worksheet = workbook.add_worksheet(name)
     serializer = serializer(queryset, many=True)
 

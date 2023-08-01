@@ -14,7 +14,7 @@ from university.validators import CustomUnicodeUsernameValidator
 class UserManager(BaseUserManager["User"]):
     use_in_migrations = True
 
-    def _create_user(self, username, email, password, **extra_fields):
+    def _create_user(self, username, email, password, **extra_fields) -> "User":
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
