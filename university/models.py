@@ -172,7 +172,7 @@ class EduDirection(models.Model):
         unique=True
     )
 
-    curator = models.ForeignKey(
+    curator = models.OneToOneField(
         "Curator",
         on_delete=models.DO_NOTHING,
         related_name='directions',
