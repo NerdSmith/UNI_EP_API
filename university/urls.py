@@ -1,7 +1,8 @@
+from django.urls import path
 from rest_framework import routers
 
 from university.views import CuratorViewSet, StudentViewSet, EduDirectionViewSet, AcademicDisciplineViewSet, \
-    GroupViewSet
+    GroupViewSet, ReportView, ReportStatusView
 
 auth_router = routers.SimpleRouter()
 auth_router.register('auth/users/curators', CuratorViewSet)
@@ -13,7 +14,8 @@ edu_router.register('disciplines', AcademicDisciplineViewSet)
 edu_router.register('groups', GroupViewSet)
 
 urlpatterns = [
-
+    path(r'report/<str:task_id>', ReportStatusView.as_view()),
+    path(r'report', ReportView.as_view()),
 ]
 
 urlpatterns += auth_router.urls

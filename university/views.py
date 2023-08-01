@@ -1,14 +1,20 @@
+import os
+
 from djoser.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from djoser.permissions import CurrentUserOrAdmin
+from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from university.models import Curator, Student, EduDirection, AcademicDiscipline, Group
 from university.permissions import IsCurator, ReadOnly
 from university.serializers import CuratorSerializer, StudentSerializer, EduDirectionSerializer, \
     AcademicDisciplineSerializer, GroupSerializer
+from university.tasks import generate_report
 
 
 class CuratorViewSet(ModelViewSet):
@@ -85,3 +91,34 @@ class GroupViewSet(ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [IsAdminUser | IsCurator | ReadOnly]
+
+
+class ReportView(APIView):
+    permission_classes = [IsAdminUser, ]
+
+    def get(self, request, *args, **kwargs):
+        task = generate_report.delay()
+        response = {"task_id": task.task_id}
+        return Response(response, status=status.HTTP_202_ACCEPTED)
+
+
+class ReportStatusView(APIView):
+    permission_classes = [IsAdminUser, ]
+
+    def get(self, request, task_id, format=None):
+        task = generate_report.AsyncResult(task_id)
+        if task.state == 'PENDING':
+            return Response({'status': 'Pending'}, status=status.HTTP_202_ACCEPTED)
+        elif task.state == 'FAILURE':
+            return Response({'status': 'Failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        elif task.state == 'SUCCESS':
+            report_filename = task.result
+            from django.conf import settings
+            media_url = request.build_absolute_uri(settings.MEDIA_URL)
+            return Response(
+                {
+                    'status': 'Success',
+                    'url': media_url + report_filename
+                 }, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': 'Not found'}, status=status.HTTP_404_NOT_FOUND)

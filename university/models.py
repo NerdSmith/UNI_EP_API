@@ -175,7 +175,7 @@ class EduDirection(models.Model):
     curator = models.ForeignKey(
         "Curator",
         on_delete=models.DO_NOTHING,
-        related_name='students',
+        related_name='directions',
         blank=True, null=True)
 
     def __str__(self):
@@ -225,6 +225,15 @@ class Group(models.Model):
 
     direction = models.ForeignKey(EduDirection, on_delete=models.CASCADE, related_name='groups', blank=False,
                                   null=False)
+
+    def get_current_students(self) -> int:
+        return self.students.count()
+
+    def get_males_count(self) -> int:
+        return self.students.filter(user__gender='m').count()
+
+    def get_females_count(self) -> int:
+        return self.students.filter(user__gender='f').count()
 
     def __str__(self):
         return f"{self.course_number} course {self.group_number} group {dict(self.EDUCATION_LEVELS)[self.education_level]}"
