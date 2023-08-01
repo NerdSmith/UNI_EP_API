@@ -1,4 +1,3 @@
-from djoser import signals
 from djoser.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from djoser.permissions import CurrentUserOrAdmin
@@ -20,11 +19,11 @@ class CuratorViewSet(ModelViewSet):
     permission_classes = [IsAdminUser, ]
 
     def permission_denied(self, request, **kwargs):
-        if (
-                settings.HIDE_USERS
-                and request.user.is_authenticated
-                and self.action in ["update", "partial_update", "list", "retrieve"]
-        ):
+        if all((
+                settings.HIDE_USERS,
+                request.user.is_authenticated,
+                self.action in ["update", "partial_update", "list", "retrieve"]
+        )):
             raise NotFound()
         super().permission_denied(request, **kwargs)
 
@@ -49,11 +48,11 @@ class StudentViewSet(ModelViewSet):
     permission_classes = [IsAdminUser | IsCurator]
 
     def permission_denied(self, request, **kwargs):
-        if (
-                settings.HIDE_USERS
-                and request.user.is_authenticated
-                and self.action in ["update", "partial_update", "list", "retrieve"]
-        ):
+        if all((
+            settings.HIDE_USERS,
+            request.user.is_authenticated,
+            self.action in ["update", "partial_update", "list", "retrieve"]
+        )):
             raise NotFound()
         super().permission_denied(request, **kwargs)
 
@@ -65,7 +64,7 @@ class StudentViewSet(ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.action in ("retrieve", "update", "partial_update", "destroy"):
+        if self.action in ("retrieve", "update", "partial_update", "destroy", "list"):
             self.permission_classes = [CurrentUserOrAdmin | IsCurator]
         return super().get_permissions()
 

@@ -1,4 +1,3 @@
-from django.urls import path, include
 from rest_framework import routers
 
 from university.views import CuratorViewSet, StudentViewSet, EduDirectionViewSet, AcademicDisciplineViewSet, \

@@ -130,6 +130,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return "not set"
 
+    def __str__(self):
+        return f"User -> {self.last_name} {self.first_name} {self.patronymic}"
+
 
 class Curator(models.Model):
     user = models.OneToOneField(
@@ -138,6 +141,9 @@ class Curator(models.Model):
         on_delete=models.CASCADE,
         related_name='curator',
         blank=False, null=False)
+
+    def __str__(self):
+        return f"Curator -> {self.user.last_name} {self.user.first_name} {self.user.patronymic}"
 
 
 class Student(models.Model):
@@ -152,6 +158,9 @@ class Student(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='students',
         blank=False, null=False)
+
+    def __str__(self):
+        return f"Student -> {self.user.last_name} {self.user.first_name} {self.user.patronymic}"
 
 
 class EduDirection(models.Model):
@@ -180,6 +189,12 @@ class AcademicDiscipline(models.Model):
         blank=False,
         null=False,
         unique=True
+    )
+    description = models.CharField(
+        _("Discipline description"),
+        max_length=200,
+        blank=True,
+        null=False
     )
 
     direction = models.ForeignKey(

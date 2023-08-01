@@ -67,10 +67,12 @@ class StudentSerializer(ModelSerializer):
 
     def validate_group(self, value):
         if value:
-            target_group = Group.objects.filter(pk=value)
+            target_group = Group.objects.get(pk=value.pk)
             if target_group and target_group.students.count() < Group.STUDENT_MAX_COUNT:
                 return value
-        return serializers.ValidationError("Group field not set")
+            else:
+                raise serializers.ValidationError("Max students in group")
+        raise serializers.ValidationError("Group field not set")
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
