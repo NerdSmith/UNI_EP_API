@@ -113,24 +113,26 @@ class StudentCreateSerializer(serializers.ModelSerializer):
         student = Student.objects.create(user=user, group=group)
         return student
 
+class WrUserSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        user_obj = instance.user
+        user_data = validated_data.pop("user", {})
+        instance = super().update(instance, validated_data)
+        user_serializer = MyUserSerializer(user_obj, user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        instance.save()
+        return instance
 
-class CuratorSerializer(serializers.ModelSerializer):
+class CuratorSerializer(WrUserSerializer):
     user = MyUserSerializer()
 
     class Meta:
         model = Curator
         fields = ('pk', 'user', )
 
-    def update(self, instance, validated_data):
-        user_obj = instance.user
-        user_serializer = MyUserSerializer(user_obj, validated_data.pop("user", {}), partial=True)
-        if user_serializer.is_valid():
-            user_serializer.save()
-        instance.save()
-        return instance
 
-
-class StudentSerializer(serializers.ModelSerializer):
+class StudentSerializer(WrUserSerializer):
     user = MyUserSerializer()
 
     class Meta:
