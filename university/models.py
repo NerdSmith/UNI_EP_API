@@ -1,3 +1,5 @@
+from typing import Union
+
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
@@ -130,6 +132,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return "not set"
 
+    def get_related_role(self) -> Union[None, 'Curator', 'Student']:
+        if hasattr(self, "curator"):
+            return self.curator
+        elif hasattr(self, "student"):
+            return self.student
+        else:
+            return None
+
     def __str__(self):
         return f"User -> {self.last_name} {self.first_name} {self.patronymic}"
 
@@ -239,3 +249,6 @@ class Group(models.Model):
 
     def __str__(self):
         return f"{self.course_number} course {self.group_number} group {dict(self.EDUCATION_LEVELS)[self.education_level]}"
+
+    class Meta:
+        unique_together = [('course_number', 'group_number', 'education_level')] # direction
