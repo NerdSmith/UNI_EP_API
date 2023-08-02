@@ -14,7 +14,7 @@ from celery import shared_task
 from django.conf import settings
 
 from university.models import EduDirection
-from university.serializers import ReportEduDirectionDisciplineSerializer, ReportEduDirectionGroupSerializer
+from university.report_serializers import ReportEduDirectionDisciplineSerializer, ReportEduDirectionGroupSerializer
 
 
 def prepare_headlines_wr(main_title, worksheet, data) -> None:
