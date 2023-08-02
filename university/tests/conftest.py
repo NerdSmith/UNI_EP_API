@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth.hashers import make_password
 
-from university.models import Curator, Student, EduDirection
+from university.models import Curator, Student, EduDirection, Group
 
 
 @pytest.fixture
@@ -50,12 +50,6 @@ def edudir_payload(curator_user):
 
 
 @pytest.fixture
-def edudir(db, edudir_payload):
-    edudir_payload["curator"] = Curator.objects.get(pk=edudir_payload["curator"])
-    return EduDirection.objects.create(**edudir_payload)
-
-
-@pytest.fixture
 def discipline_payload(edudir):
     payload = {
         "title": "discipline",
@@ -63,6 +57,29 @@ def discipline_payload(edudir):
         "direction": edudir.pk
     }
     return payload
+
+
+@pytest.fixture
+def group_payload(edudir):
+    payload = {
+        "course_number": 1,
+        "group_number": "1.1",
+        "education_level": "b",
+        "direction": edudir.pk
+    }
+    return payload
+
+
+@pytest.fixture
+def group(db, group_payload, edudir):
+    group_payload["direction"] = edudir
+    return Group.objects.create(**group_payload)
+
+
+@pytest.fixture
+def edudir(db, edudir_payload):
+    edudir_payload["curator"] = Curator.objects.get(pk=edudir_payload["curator"])
+    return EduDirection.objects.create(**edudir_payload)
 
 
 @pytest.fixture
