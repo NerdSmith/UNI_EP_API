@@ -39,6 +39,15 @@ def student_payload():
     }
     return payload
 
+@pytest.fixture
+def edudir_payload(curator_user):
+    payload = {
+        "title": "edudir",
+        "curator": curator_user.pk
+    }
+    return payload
+
+
 
 @pytest.fixture
 def curator_user(db, django_user_model, curator_payload):
