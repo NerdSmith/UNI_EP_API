@@ -14,8 +14,8 @@ edu_router.register('disciplines', AcademicDisciplineViewSet, basename="discipli
 edu_router.register('groups', GroupViewSet, basename="groups")
 
 urlpatterns = [
-    path(r'report/<str:task_id>', ReportStatusView.as_view()),
-    path(r'report', ReportView.as_view()),
+    path(r'report/<str:task_id>', ReportStatusView.as_view(), name="get-report-status"),
+    path(r'report', ReportView.as_view(), name='get-report'),
 ]
 
 urlpatterns += auth_router.urls
