@@ -1,6 +1,5 @@
 from djoser.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from djoser.permissions import CurrentUserOrAdmin
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
@@ -9,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from university.models import Curator, Student, EduDirection, AcademicDiscipline, Group
-from university.permissions import IsCurator, ReadOnly
+from university.permissions import IsCurator, ReadOnly, CurrentUserOrAdmin
 from university.serializers import CuratorCreateSerializer, StudentCreateSerializer, EduDirectionSerializer, \
     AcademicDisciplineSerializer, GroupSerializer, CuratorSerializer, StudentSerializer
 from university.tasks import generate_report
@@ -74,13 +73,15 @@ class StudentViewSet(ModelViewSet):
         return self.serializer_class
 
     def update(self, request, *args, **kwargs):
+        if request.user.get_role() == "student":
+            request.data = request.data.pop("user", {})
         return super().update(request, partial=True)
 
     def get_queryset(self):
         user = self.request.user
         queryset = super().get_queryset()
         if settings.HIDE_USERS and self.action == "list" and not user.is_staff:
-            queryset = queryset.filter(pk=user.pk)
+            queryset = queryset.filter(pk=user.student.pk)
         return queryset
 
     def get_permissions(self):
