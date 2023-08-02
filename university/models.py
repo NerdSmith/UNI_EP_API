@@ -155,9 +155,11 @@ class Student(models.Model):
         blank=False, null=False)
     group = models.ForeignKey(
         "Group",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         related_name='students',
-        blank=False, null=False)
+        blank=False,
+        null=True
+    )
 
     def __str__(self):
         return f"Student -> {self.user.last_name} {self.user.first_name} {self.user.patronymic}"
@@ -174,7 +176,7 @@ class EduDirection(models.Model):
 
     curator = models.OneToOneField(
         "Curator",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         related_name='directions',
         blank=True, null=True)
 

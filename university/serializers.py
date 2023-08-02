@@ -1,11 +1,12 @@
-from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from university.models import User, Curator, Student, Group, EduDirection, AcademicDiscipline
 
 
-class MyUserSerializer(UserCreateSerializer):
+class MyUserCreateSerializer(UserCreateSerializer):
     username = serializers.CharField(max_length=50)
     password = serializers.CharField(write_only=True)
     first_name = serializers.CharField(max_length=20)
@@ -41,8 +42,36 @@ class MyUserSerializer(UserCreateSerializer):
                   )
 
 
-class CuratorSerializer(ModelSerializer):
-    user = MyUserSerializer(required=True)
+class MyUserSerializer(UserSerializer):
+    username = serializers.CharField(max_length=50)
+    first_name = serializers.CharField(max_length=20)
+    last_name = serializers.CharField(max_length=20)
+    patronymic = serializers.CharField(max_length=20)
+    email = serializers.CharField()
+    role = serializers.SerializerMethodField('find_role', read_only=True, required=False)
+
+    def find_role(self, obj) -> str:
+        return obj.get_role()
+
+    class Meta:
+        model = User
+        fields = ('pk',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'patronymic',
+                  'email',
+                  'role',
+                  )
+        read_only_fields = (
+            'pk',
+            'username',
+            'email',
+        )
+
+
+class CuratorCreateSerializer(serializers.ModelSerializer):
+    user = MyUserCreateSerializer(required=True)
 
     class Meta:
         model = Curator
@@ -50,7 +79,7 @@ class CuratorSerializer(ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user_serializer = MyUserSerializer(data=user_data)
+        user_serializer = MyUserCreateSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
 
@@ -58,8 +87,8 @@ class CuratorSerializer(ModelSerializer):
         return curator
 
 
-class StudentSerializer(ModelSerializer):
-    user = MyUserSerializer(required=True)
+class StudentCreateSerializer(serializers.ModelSerializer):
+    user = MyUserCreateSerializer(required=True)
 
     class Meta:
         model = Student
@@ -77,12 +106,45 @@ class StudentSerializer(ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         group = validated_data['group']
-        user_serializer = MyUserSerializer(data=user_data)
+        user_serializer = MyUserCreateSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
 
         student = Student.objects.create(user=user, group=group)
         return student
+
+
+class CuratorSerializer(serializers.ModelSerializer):
+    user = MyUserSerializer()
+
+    class Meta:
+        model = Curator
+        fields = ('pk', 'user', )
+
+    def update(self, instance, validated_data):
+        user_obj = instance.user
+        user_serializer = MyUserSerializer(user_obj, validated_data.pop("user", {}), partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        instance.save()
+        return instance
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    user = MyUserSerializer()
+
+    class Meta:
+        model = Student
+        fields = ('pk', 'user', 'group')
+
+    def validate_group(self, value):
+        if value:
+            target_group = Group.objects.get(pk=value.pk)
+            if target_group and target_group.students.count() < Group.STUDENT_MAX_COUNT:
+                return value
+            else:
+                raise serializers.ValidationError("Max students in group")
+        raise serializers.ValidationError("Group field not set")
 
 
 class EduDirectionSerializer(ModelSerializer):

@@ -10,8 +10,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from university.models import Curator, Student, EduDirection, AcademicDiscipline, Group
 from university.permissions import IsCurator, ReadOnly
-from university.serializers import CuratorSerializer, StudentSerializer, EduDirectionSerializer, \
-    AcademicDisciplineSerializer, GroupSerializer
+from university.serializers import CuratorCreateSerializer, StudentCreateSerializer, EduDirectionSerializer, \
+    AcademicDisciplineSerializer, GroupSerializer, CuratorSerializer, StudentSerializer
 from university.tasks import generate_report
 
 
@@ -30,6 +30,14 @@ class CuratorViewSet(ModelViewSet):
         )):
             raise NotFound()
         super().permission_denied(request, **kwargs)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CuratorCreateSerializer
+        return self.serializer_class
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, partial=True)
 
     def get_queryset(self):
         user = self.request.user
@@ -59,6 +67,14 @@ class StudentViewSet(ModelViewSet):
         )):
             raise NotFound()
         super().permission_denied(request, **kwargs)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return StudentCreateSerializer
+        return self.serializer_class
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, partial=True)
 
     def get_queryset(self):
         user = self.request.user

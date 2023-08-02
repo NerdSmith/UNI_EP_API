@@ -5,7 +5,7 @@ from university.views import CuratorViewSet, StudentViewSet, EduDirectionViewSet
     GroupViewSet, ReportView, ReportStatusView
 
 auth_router = routers.SimpleRouter()
-auth_router.register('auth/users/curators', CuratorViewSet)
+auth_router.register('auth/users/curators', CuratorViewSet, basename="curators")
 auth_router.register('auth/users/students', StudentViewSet)
 
 edu_router = routers.SimpleRouter()
