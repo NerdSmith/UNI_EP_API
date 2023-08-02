@@ -251,4 +251,4 @@ class Group(models.Model):
         return f"{self.course_number} course {self.group_number} group {dict(self.EDUCATION_LEVELS)[self.education_level]}"
 
     class Meta:
-        unique_together = [('course_number', 'group_number', 'education_level')] # direction
+        unique_together = [('course_number', 'group_number', 'education_level')]  # direction

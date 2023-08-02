@@ -1,5 +1,4 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -75,7 +74,7 @@ class CuratorCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Curator
-        fields = ('pk', 'user', )
+        fields = ('pk', 'user',)
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -113,6 +112,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
         student = Student.objects.create(user=user, group=group)
         return student
 
+
 class WrUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_obj = instance.user
@@ -124,12 +124,13 @@ class WrUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class CuratorSerializer(WrUserSerializer):
     user = MyUserSerializer()
 
     class Meta:
         model = Curator
-        fields = ('pk', 'user', )
+        fields = ('pk', 'user',)
 
 
 class StudentSerializer(WrUserSerializer):
@@ -180,7 +181,7 @@ class ReportCuratorSerializer(ModelSerializer):
 class ReportAcademicDisciplineSerializer(ModelSerializer):
     class Meta:
         model = AcademicDiscipline
-        fields = ('title', )
+        fields = ('title',)
 
 
 class ReportEduDirectionDisciplineSerializer(ModelSerializer):
@@ -237,4 +238,4 @@ class ReportEduDirectionGroupSerializer(ModelSerializer):
 
     class Meta:
         model = EduDirection
-        fields = ('title', 'groups', )
+        fields = ('title', 'groups',)
