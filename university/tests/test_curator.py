@@ -95,9 +95,7 @@ def test_curator_by_admin(admin_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_put_payload = {}
-    curator_put_payload['user'] = {}
-    curator_put_payload['user']["first_name"] = "Oleg"
+    curator_put_payload = {'user': {"first_name": "Oleg"}}
     response = admin_client.put(
         url,
         data=curator_put_payload,
@@ -109,9 +107,7 @@ def test_curator_by_admin(admin_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_patch_payload = {}
-    curator_patch_payload['user'] = {}
-    curator_patch_payload['user']["first_name"] = "Oleg"
+    curator_patch_payload = {'user': {"first_name": "Oleg"}}
     response = admin_client.patch(
         url,
         data=curator_patch_payload,
@@ -160,9 +156,7 @@ def test_curator_by_curator(curator_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_put_payload = {}
-    curator_put_payload['user'] = {}
-    curator_put_payload['user']["first_name"] = "Oleg"
+    curator_put_payload = {'user': {"first_name": "Oleg"}}
     response = curator_client.put(
         url,
         data=curator_put_payload,
@@ -174,9 +168,7 @@ def test_curator_by_curator(curator_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_patch_payload = {}
-    curator_patch_payload['user'] = {}
-    curator_patch_payload['user']["first_name"] = "Oleg"
+    curator_patch_payload = {'user': {"first_name": "Oleg"}}
     response = curator_client.patch(
         url,
         data=curator_patch_payload,
@@ -225,9 +217,7 @@ def test_curator_by_student(student_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_put_payload = {}
-    curator_put_payload['user'] = {}
-    curator_put_payload['user']["first_name"] = "Oleg"
+    curator_put_payload = {'user': {"first_name": "Oleg"}}
     response = student_client.put(
         url,
         data=curator_put_payload,
@@ -239,9 +229,7 @@ def test_curator_by_student(student_client, curator_payload):
         'curators-detail',
         kwargs={'id': id}
     )
-    curator_patch_payload = {}
-    curator_patch_payload['user'] = {}
-    curator_patch_payload['user']["first_name"] = "Oleg"
+    curator_patch_payload = {'user': {"first_name": "Oleg"}}
     response = student_client.patch(
         url,
         data=curator_patch_payload,

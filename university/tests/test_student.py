@@ -95,9 +95,7 @@ def test_student_by_admin(admin_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_put_payload = {}
-    student_put_payload['user'] = {}
-    student_put_payload['user']["first_name"] = "Oleg"
+    student_put_payload = {'user': {"first_name": "Oleg"}}
     response = admin_client.put(
         url,
         data=student_put_payload,
@@ -109,9 +107,7 @@ def test_student_by_admin(admin_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_patch_payload = {}
-    student_patch_payload['user'] = {}
-    student_patch_payload['user']["first_name"] = "Oleg"
+    student_patch_payload = {'user': {"first_name": "Oleg"}}
     response = admin_client.patch(
         url,
         data=student_patch_payload,
@@ -160,9 +156,7 @@ def test_student_by_curator(curator_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_put_payload = {}
-    student_put_payload['user'] = {}
-    student_put_payload['user']["first_name"] = "Oleg"
+    student_put_payload = {'user': {"first_name": "Oleg"}}
     response = curator_client.put(
         url,
         data=json.dumps(student_put_payload),
@@ -174,9 +168,7 @@ def test_student_by_curator(curator_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_patch_payload = {}
-    student_patch_payload['user'] = {}
-    student_patch_payload['user']["first_name"] = "Oleg"
+    student_patch_payload = {'user': {"first_name": "Oleg"}}
     response = curator_client.patch(
         url,
         data=json.dumps(student_patch_payload),
@@ -225,9 +217,7 @@ def test_student_by_student(student_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_put_payload = {}
-    student_put_payload['user'] = {}
-    student_put_payload['user']["first_name"] = "Oleg"
+    student_put_payload = {'user': {"first_name": "Oleg"}}
     response = student_client.put(
         url,
         data=json.dumps(student_put_payload),
@@ -239,9 +229,7 @@ def test_student_by_student(student_client, student_payload):
         'students-detail',
         kwargs={'id': id}
     )
-    student_patch_payload = {}
-    student_patch_payload['user'] = {}
-    student_patch_payload['user']["first_name"] = "Oleg"
+    student_patch_payload = {'user': {"first_name": "Oleg"}}
     response = student_client.patch(
         url,
         data=json.dumps(student_patch_payload),

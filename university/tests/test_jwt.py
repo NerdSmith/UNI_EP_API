@@ -13,7 +13,7 @@ def test_jwt_unauthorized(client):
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-def check_token(client, user_data):
+def check_token(client, user_data) -> None:
     url = reverse('jwt-create')
     response = client.post(
         url,

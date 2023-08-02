@@ -23,7 +23,7 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('jwt/auth/', include('djoser.urls.jwt')),
-    path('', include('university.urls')),
+    path('api/v1/', include('university.urls')),
     path('doc/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('doc/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

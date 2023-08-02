@@ -169,7 +169,8 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_SETTINGS": {
         "filter": True,
     },
-    "COMPONENT_SPLIT_REQUEST": True
+    "COMPONENT_SPLIT_REQUEST": True,
+    'SCHEMA_PATH_PREFIX': r'/api/v[0-9]',
 }
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379"
