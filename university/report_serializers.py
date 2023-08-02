@@ -75,3 +75,16 @@ class ReportEduDirectionGroupSerializer(ModelSerializer):
     class Meta:
         model = EduDirection
         fields = ('title', 'groups',)
+
+
+class ReportViewSerializer(serializers.Serializer):
+    task_id = serializers.IntegerField()
+
+
+class ReportStatus(serializers.Serializer):
+    status = serializers.CharField()
+
+
+class ReportStatusSuccess(serializers.Serializer):
+    status = serializers.CharField()
+    url = serializers.URLField()

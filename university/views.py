@@ -1,5 +1,6 @@
 from djoser.conf import settings
 from django.contrib.auth.tokens import default_token_generator
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
@@ -9,6 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from university.models import Curator, Student, EduDirection, AcademicDiscipline, Group
 from university.permissions import IsCurator, ReadOnly, CurrentUserOrAdmin
+from university.report_serializers import ReportViewSerializer, ReportStatusSuccess, ReportStatus
 from university.serializers import CuratorCreateSerializer, StudentCreateSerializer, EduDirectionSerializer, \
     AcademicDisciplineSerializer, GroupSerializer, CuratorSerializer, StudentSerializer
 from university.tasks import generate_report
@@ -113,15 +115,23 @@ class GroupViewSet(ModelViewSet):
 class ReportView(APIView):
     permission_classes = [IsAdminUser, ]
 
+    @extend_schema(request=None, responses=ReportViewSerializer)
     def get(self, request, *args, **kwargs):
         task = generate_report.delay()
         response = {"task_id": task.task_id}
-        return Response(response, status=status.HTTP_202_ACCEPTED)
+        res = ReportViewSerializer(response)
+        return Response(res.data, status=status.HTTP_202_ACCEPTED)
 
 
 class ReportStatusView(APIView):
     permission_classes = [IsAdminUser, ]
 
+    @extend_schema(request=None, responses={
+        status.HTTP_202_ACCEPTED: ReportStatus,
+        status.HTTP_500_INTERNAL_SERVER_ERROR: ReportStatus,
+        status.HTTP_200_OK: ReportStatusSuccess,
+        status.HTTP_404_NOT_FOUND: ReportStatus
+    })
     def get(self, request, task_id, format=None):
         task = generate_report.AsyncResult(task_id)
         if task.state == 'PENDING':
