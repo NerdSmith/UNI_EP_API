@@ -74,13 +74,15 @@ class StudentViewSet(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         if request.user.get_role() == "student":
-            request.data = request.data.pop("user", {})
+            prev_data = {'user': request.data.pop("user", {})}
+            request.data.clear()
+            request.data.update(prev_data)
         return super().update(request, partial=True)
 
     def get_queryset(self):
         user = self.request.user
         queryset = super().get_queryset()
-        if settings.HIDE_USERS and self.action == "list" and not user.is_staff:
+        if settings.HIDE_USERS and self.action == "list" and not user.is_staff and user.get_role() == "student":
             queryset = queryset.filter(pk=user.student.pk)
         return queryset
 

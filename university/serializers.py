@@ -105,7 +105,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        group = validated_data['group']
+        group = validated_data.pop('group', None)
         user_serializer = MyUserCreateSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
